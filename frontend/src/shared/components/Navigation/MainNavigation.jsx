@@ -17,7 +17,7 @@ const MainNavigation = () => {
   return (
     <>
       {menuOpen && isMobile && <Backdrop onClick={onClose} />}
-      <MobileMenu show={menuOpen}>
+      <MobileMenu show={menuOpen} onClick={onClose}>
         <NavLinks />
       </MobileMenu>
 
