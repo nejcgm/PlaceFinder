@@ -16,14 +16,10 @@ const MainNavigation = () => {
   };
   return (
     <>
-      {menuOpen && isMobile && (
-        <>
-          <Backdrop onClick={onClose} />
-          <MobileMenu>
-            <NavLinks />
-          </MobileMenu>
-        </>
-      )}
+      {menuOpen && isMobile && <Backdrop onClick={onClose} />}
+      <MobileMenu show={menuOpen}>
+        <NavLinks />
+      </MobileMenu>
 
       <MainHeader>
         <button
