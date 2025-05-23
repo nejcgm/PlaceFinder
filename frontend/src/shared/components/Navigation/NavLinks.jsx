@@ -14,7 +14,7 @@ const NavLinks = () => {
       </div>
       <div>
         <NavLink
-          to="/u1/placs"
+          to="/u1/places"
           className={({ isActive }) => (isActive ? "font-bold" : undefined)}
         >
           My Places

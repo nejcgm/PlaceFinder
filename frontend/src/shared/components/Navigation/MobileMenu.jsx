@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { CSSTransition } from "react-transition-group";
 import "./MobileMenu.css";
 
-const MobileMenu = ({ children, show,onClick }) => {
+const MobileMenu = ({ children, show, onClick }) => {
   const nodeRef = useRef(null);
   const content = (
     <CSSTransition
