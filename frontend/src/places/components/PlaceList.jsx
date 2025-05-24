@@ -1,13 +1,15 @@
 import React from "react";
 import Card from "../../shared/components/UIElements/Card/Card";
 import PlaceItem from "./PlaceItem";
+import Button from "../../shared/components/FormElements/Button/Button";
 
 const PlaceList = ({places}) => {
   if (places.length === 0) {
     return (
       <div className="flex flex-col items-center py-4">
-        <Card>No users found.</Card>
-        <button>Share Place</button>
+        <Card className='flex flex-col'>No users found.
+        <Button to='/places/new'>Share Place</Button>
+        </Card>
       </div>
     );
   }

@@ -33,7 +33,11 @@ const PLACES = [
 
 const UserPlaces = () => {
   const userId = useParams().userId;
-  return <PlaceList places={PLACES} />;
+  console.log(userId)
+
+  const userPlaces = PLACES.filter((u) => u.creator === userId);
+
+  return <PlaceList places={userPlaces} />;
 };
 
 export default UserPlaces;
