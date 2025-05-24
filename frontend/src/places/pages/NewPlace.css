@@ -1,6 +1,7 @@
 .place-form {
   list-style: none;
   margin: 0 auto;
+  margin-top: 100px;
   padding: 1rem;
   width: 90%;
   max-width: 40rem;
