@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import Card from "../../shared/components/UIElements/Card/Card";
 import Button from "../../shared/components/FormElements/Button/Button";
 import Modal from "../../shared/components/UIElements/Modal/Modal";
 import "../../shared/components/UIElements/Modal/Modal.css";
 import { Map, Marker } from "pigeon-maps";
+import { AuthContext } from "../../shared/context/AuthContext";
 
 const PlaceItem = ({
   id,
@@ -16,16 +17,7 @@ const PlaceItem = ({
 }) => {
   const [showMap, setShowMap] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  // const [isImageLoaded, setIsImageLoaded] = useState(false);
-
-  // useEffect(() => {
-  //   const img = new Image();
-  //   img.src = image;
-  //   img.onload = () => setIsImageLoaded(true);
-  //   img.onerror = () => setIsImageLoaded(true); // or handle error
-  // }, [image]);
-
-  // if (!isImageLoaded) return null;
+  const auth = useContext(AuthContext);
 
   const handleShowDeleteDialog = () => {
     setShowDeleteDialog(true);
@@ -36,11 +28,10 @@ const PlaceItem = ({
 
   const confirmDelete = () => {
     //delete
-    console.log("ne");
     setShowDeleteDialog(false);
   };
 
-  const openMapHandler = () => setShowMap(false);
+  const openMapHandler = () => setShowMap(true);
 
   const closeMapHandler = () => setShowMap(false);
 
@@ -93,10 +84,14 @@ const PlaceItem = ({
           <Button inverse onClick={openMapHandler}>
             View on Map
           </Button>
-          <Button to={`/places/${id}`}>Edit</Button>
-          <Button danger onClick={handleShowDeleteDialog}>
-            Delete
-          </Button>
+          {auth.isLoggedIn && (
+            <>
+              <Button to={`/places/${id}`}>Edit</Button>
+              <Button danger onClick={handleShowDeleteDialog}>
+                Delete
+              </Button>
+            </>
+          )}
         </div>
       </Card>
     </>
