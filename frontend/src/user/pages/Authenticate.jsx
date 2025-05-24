@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import Input from "../../shared/components/FormElements/Input/Input";
 import Button from "../../shared/components/FormElements/Button/Button";
 import { useForm } from "../../shared/hooks/FormHook";
@@ -9,9 +9,11 @@ import {
   VALIDATOR_MATCHPASSWORD,
 } from "../../shared/util/validators";
 import "../../places/pages/NewPlace.css";
+import { AuthContext } from "../../shared/context/AuthContext";
 
 const Register = () => {
-  const [isLogin, setIslogin] = useState(true);
+  const auth = useContext(AuthContext)
+  const [isLogin, setIsLogin] = useState(true);
   const [formState, InputHandler, setFormData] = useForm(
     {
       email: {
@@ -40,9 +42,10 @@ const Register = () => {
 
   const AuthenticateSubmitHandler = (event) => {
     event.preventDefault();
+    auth.logIn()
     console.log(formState.inputs);
   };
-
+console.log(formState.isValid)
   const switchHandler = () => {
     if (!isLogin) {
       setFormData(
@@ -75,8 +78,9 @@ const Register = () => {
       );
     }
 
-    setIslogin((prev) => !prev);
+    setIsLogin((prev) => !prev);
   };
+  
 
   return (
     <form className="place-form" onSubmit={AuthenticateSubmitHandler}>
