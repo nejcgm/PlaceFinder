@@ -30,14 +30,15 @@ const Input = ({
   errorText,
   validators,
   onInput,
+  defaultValue,
+  defaultIsValid,
 }) => {
   const [inputState, dispatch] = useReducer(inputReducer, {
-    value: "",
-    isValid: false,
+    value: defaultValue || "",
+    isValid: defaultIsValid || false,
     isTouched: false,
   });
 
-  // Removed unused destructured variables
   const { value, isValid } = inputState;
 
   useEffect(() => {
