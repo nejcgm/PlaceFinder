@@ -47,6 +47,17 @@ export const useForm = (initialInput, initialFormValid) => {
       isValid: isValid,
       inputId: id,
     });
+    if (id === "password" && formState.inputs.confirmPassword) {
+      const confirmPasswordValue = formState.inputs.confirmPassword.value;
+      const confirmPasswordIsValid = confirmPasswordValue === value;
+
+      dispatch({
+        type: "INPUT_CHANGE",
+        value: confirmPasswordValue,
+        isValid: confirmPasswordIsValid,
+        inputId: "confirmPassword",
+      });
+    }
   }, []);
 
   const setFormData = useCallback((inputData, formValidity) => {

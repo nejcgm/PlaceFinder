@@ -120,7 +120,7 @@ console.log(formState.isValid)
             label="Confirm Password"
             type="password"
             validators={[
-              VALIDATOR_MATCHPASSWORD(formState.inputs.password.value || ""),
+              VALIDATOR_MATCHPASSWORD(() => formState.inputs.password.value)
             ]}
             errorText={"Passwords dont match"}
             onInput={InputHandler}

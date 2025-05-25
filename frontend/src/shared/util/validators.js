@@ -47,7 +47,7 @@ export const validate = (value, validators) => {
       isValid = isValid && /^\S+@\S+\.\S+$/.test(value);
     }
     if (validator.type === VALIDATOR_TYPE_MATCHPASSWORD) {
-      isValid = isValid && value === validator.val;
+      isValid = isValid && value === validator.val();
     }
   }
   return isValid;
