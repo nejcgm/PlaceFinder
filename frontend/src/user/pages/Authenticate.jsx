@@ -1,4 +1,4 @@
-import React, { useState,useContext } from "react";
+import React, { useState, useContext } from "react";
 import Input from "../../shared/components/FormElements/Input/Input";
 import Button from "../../shared/components/FormElements/Button/Button";
 import { useForm } from "../../shared/hooks/FormHook";
@@ -12,8 +12,8 @@ import "../../places/pages/NewPlace.css";
 import { AuthContext } from "../../shared/context/AuthContext";
 
 const Register = () => {
-  const auth = useContext(AuthContext)
-  const [isLogin, setIsLogin] = useState(true);
+  const auth = useContext(AuthContext);
+  const [isLogin, setIsLogin] = useState(false);
   const [formState, InputHandler, setFormData] = useForm(
     {
       email: {
@@ -42,7 +42,7 @@ const Register = () => {
 
   const AuthenticateSubmitHandler = (event) => {
     event.preventDefault();
-    auth.logIn()
+    auth.logIn();
     console.log(formState.inputs);
   };
 console.log(formState.isValid)
@@ -80,7 +80,6 @@ console.log(formState.isValid)
 
     setIsLogin((prev) => !prev);
   };
-  
 
   return (
     <form className="place-form" onSubmit={AuthenticateSubmitHandler}>
@@ -143,7 +142,7 @@ console.log(formState.isValid)
       <Button
         inverse
         onClick={(e) => {
-          switchHandler(), e.preventDefault();
+          switchHandler(); e.preventDefault();
         }}
       >
         {!isLogin ? "Login" : "Register"}
