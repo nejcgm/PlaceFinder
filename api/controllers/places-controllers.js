@@ -1,5 +1,6 @@
 const HttpError = require("../models/http-error");
 const uuid = require("uuid").v4;
+const { validationResult } = require("express-validator");
 
 const PLACES = [
   {
@@ -16,15 +17,6 @@ const PLACES = [
   },
 ];
 
-const USERS = [
-  {
-    id: "u1",
-    name: "John Wick",
-    image: "https://variety.com/wp-content/uploads/2023/03/John-Wick-3.jpg",
-    places: 3,
-  },
-];
-
 const getPlaceById = (req, res, next) => {
   const placeId = req.params.placeId;
   const place = PLACES.find((p) => p.id === placeId);
@@ -37,15 +29,20 @@ const getPlaceById = (req, res, next) => {
 
 const getPlacesByUserId = (req, res, next) => {
   const userId = req.params.userId;
-  const user = PLACES.find((p) => p.creator === userId);
+  const places = PLACES.filter((p) => p.creator === userId);
 
-  if (!user) {
-    throw new HttpError("Could not find a user for the provided id.", 404);
+  if (!places || places.length === 0) {
+    throw new HttpError("Could not find places for the provided user id.", 404);
   }
-  res.json({ user });
+  res.json({ places });
 };
 
 const createPlace = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new HttpError("Invalid inputs passed, please check your data.", 422);
+  }
+
   const { title, description, imageUrl, address, location, creator } = req.body;
 
   const createdPlace = {
@@ -62,6 +59,39 @@ const createPlace = (req, res, next) => {
   res.status(201).json({ place: createdPlace });
 };
 
-exports.createPlace = createPlace;
+const updatePlace = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new HttpError("Invalid inputs passed, please check your data.", 422);
+  }
+  const placeId = req.params.placeId;
+  const { title, description } = req.body;
+  const updatedPlace = { ...PLACES.find((p) => p.id === placeId) };
+  const placeIndex = PLACES.findIndex((p) => p.id === placeId);
+  if (!updatedPlace || placeIndex === -1) {
+    throw new HttpError("Could not find a place for the provided id.", 404);
+  }
+  updatedPlace.title = title;
+  updatedPlace.description = description;
+
+  PLACES[placeIndex] = updatedPlace;
+
+  res.status(200).json({ place: updatedPlace });
+};
+
+const deletePlace = (req, res, next) => {
+  const placeId = req.params.placeId;
+  const placeIndex = PLACES.findIndex((p) => p.id === placeId);
+  if (placeIndex === -1 || !PLACES[placeIndex]) {
+    throw new HttpError("Could not find a place for the provided id.", 404);
+  }
+  PLACES.splice(placeIndex, 1);
+
+  res.status(200).json({ message: "Place deleted." });
+};
+
 exports.getPlaceById = getPlaceById;
 exports.getPlacesByUserId = getPlacesByUserId;
+exports.createPlace = createPlace;
+exports.updatePlace = updatePlace;
+exports.deletePlace = deletePlace;
