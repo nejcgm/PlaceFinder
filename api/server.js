@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-require('dotenv').config();
+require("dotenv").config();
 const HttpError = require("./models/http-error");
 
 const placesRoutes = require("./routes/places-routes");
@@ -30,10 +30,14 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occurred!" });
 });
 
-mongoose.connect(`mongodb+srv://${DB_USER}:${DB_PASSWORD}@cluster0.ba80bjb.mongodb.net/${DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`).then(() => {
-  app.listen(8000);
-  console.log('connection success')
-}).catch(err => {
-  console.log("Connection error:", err);
-});
-
+mongoose
+  .connect(
+    `mongodb+srv://${DB_USER}:${DB_PASSWORD}@cluster0.ba80bjb.mongodb.net/${DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`
+  )
+  .then(() => {
+    app.listen(8000);
+    console.log("connection success");
+  })
+  .catch((err) => {
+    console.log("Connection error:", err);
+  });

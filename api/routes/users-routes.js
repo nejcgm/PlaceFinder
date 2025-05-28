@@ -11,12 +11,6 @@ router.post(
   check("name").notEmpty(),
   check("email").normalizeEmail().isEmail(),
   check("password").isLength({ min: 8 }),
-  check("confirmPassword").custom((value, { req }) => {
-    if (value !== req.body.password) {
-      throw new Error("Passwords do not match");
-    }
-    return true;
-  }),
   usersControllers.register
 );
 
