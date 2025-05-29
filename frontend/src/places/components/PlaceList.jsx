@@ -3,11 +3,11 @@ import Card from "../../shared/components/UIElements/Card/Card";
 import PlaceItem from "./PlaceItem";
 import Button from "../../shared/components/FormElements/Button/Button";
 
-const PlaceList = ({places}) => {
+const PlaceList = ({places, onDelete}) => {
   if (places.length === 0) {
     return (
       <div className="flex flex-col items-center py-4">
-        <Card className='flex flex-col'>No users found.
+        <Card className='flex flex-col'>No places found.
         <Button to='/places/new'>Share Place</Button>
         </Card>
       </div>
@@ -25,6 +25,7 @@ const PlaceList = ({places}) => {
           address={place.address}
           creatorId={place.creator}
           coordinates={place.location}
+          onDelete={onDelete}
         />
       ))}
     </div>
