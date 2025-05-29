@@ -13,6 +13,7 @@ router.post(
   check("title").notEmpty(),
   check("description").isLength({ min: 5 }),
   check("address").notEmpty(),
+  check("imageUrl").notEmpty(),
   placesControllers.createPlace
 );
 
@@ -20,6 +21,8 @@ router.patch(
   "/:placeId",
   check("title").notEmpty(),
   check("description").isLength({ min: 5 }),
+  check("address").notEmpty(),
+  check("imageUrl").notEmpty(),
   placesControllers.updatePlace
 );
 

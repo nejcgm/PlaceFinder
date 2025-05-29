@@ -69,7 +69,7 @@ const createPlace = async (req, res, next) => {
   const createdPlace = new Place({
     title,
     description,
-    image: "https://example.com/empire-state.jpg",
+    image: imageUrl,
     address,
     location,
     creator,
@@ -108,7 +108,7 @@ const updatePlace = async (req, res, next) => {
     );
   }
   const placeId = req.params.placeId;
-  const { title, description } = req.body;
+  const { title, description, address, imageUrl } = req.body;
 
   let place;
   try {
@@ -122,9 +122,21 @@ const updatePlace = async (req, res, next) => {
       new HttpError("Could not find a place for the provided id.", 404)
     );
   }
+  let location;
+  try {
+    location = await getCoordinates(address);
+  } catch (error) {
+    return next(
+      new HttpError("Could not fetch location for the specified address.", 500)
+    );
+  }
+
   place.title = title;
   place.description = description;
-
+  place.address = address;
+  place.image = imageUrl;
+  place.location = location;
+  
   try {
     await place.save();
   } catch (err) {

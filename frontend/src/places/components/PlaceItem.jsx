@@ -5,6 +5,9 @@ import Modal from "../../shared/components/UIElements/Modal/Modal";
 import "../../shared/components/UIElements/Modal/Modal.css";
 import { Map, Marker } from "pigeon-maps";
 import { AuthContext } from "../../shared/context/AuthContext";
+import { useHttpClient } from "../../shared/hooks/HttpHook";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/ErrorModal/LoadingSpinner";
 
 const PlaceItem = ({
   id,
@@ -12,12 +15,13 @@ const PlaceItem = ({
   title,
   description,
   address,
-  creatorId,
   coordinates,
+  onDelete,
 }) => {
   const [showMap, setShowMap] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const auth = useContext(AuthContext);
+    const {isLoading, error, sendRequest, handleErrorClear } = useHttpClient();
 
   const handleShowDeleteDialog = () => {
     setShowDeleteDialog(true);
@@ -26,9 +30,19 @@ const PlaceItem = ({
     setShowDeleteDialog(false);
   };
 
-  const confirmDelete = () => {
-    //delete
-    setShowDeleteDialog(false);
+  const confirmDelete = async () => {
+    try {
+      setShowDeleteDialog(false);
+      const response = await sendRequest(`http://localhost:8000/api/places/${id}`, "DELETE");
+      if (response === null || response === undefined) {
+        console.error("Unexpected server response: null or undefined");
+        console.log(response)
+        throw new Error("Unexpected server response: null or undefined");
+      }
+      onDelete(id);
+    } catch (error) {
+      console.error("Error deleting place:", error);
+    }
   };
 
   const openMapHandler = () => setShowMap(true);
@@ -37,6 +51,7 @@ const PlaceItem = ({
 
   return (
     <>
+    <ErrorModal error={error} onClear={handleErrorClear} />
       <Modal
         show={showMap}
         onCancel={closeMapHandler}
@@ -72,6 +87,7 @@ const PlaceItem = ({
         <p>This action can not be undone.</p>
       </Modal>
       <Card className="w-full max-w-[800px]">
+        {isLoading && <LoadingSpinner asOverlay/>}
         <div className="relative w-full aspect-[16/9]">
           <img className="w-full h-full" src={image} alt={title} />
         </div>

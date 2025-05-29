@@ -20,7 +20,7 @@ const NavLinks = () => {
         <>
           <div>
             <NavLink
-              to="/u1/places"
+              to={`/${auth.userId}/places`}
               className={({ isActive }) => (isActive ? "font-bold" : undefined)}
             >
               My Places

@@ -69,7 +69,7 @@ const logIn = async (req, res, next) => {
     );
   }
 
-  res.json({ message: "Logged in successfully!", user: existingUser });
+  res.json({ message: "Logged in successfully!", user: existingUser.toObject({ getters: true }) });
 };
 
 exports.getAllUsers = getAllUsers;

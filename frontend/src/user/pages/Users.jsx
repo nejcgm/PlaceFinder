@@ -1,19 +1,36 @@
-import React from 'react'
-import UsersList from '../components/UsersList'
+import React, { useEffect, useState } from "react";
+import UsersList from "../components/UsersList";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/ErrorModal/LoadingSpinner";
+import { useHttpClient } from "../../shared/hooks/HttpHook";
 
 const Users = () => {
-    const usersData = [
-        {
-          id: 'u1',
-          name: 'John Wick',
-          image: 'https://variety.com/wp-content/uploads/2023/03/John-Wick-3.jpg',
-          places: 3,
-        },
-    ];
+  const [usersData, setUsersData] = useState([]);
+  const { isLoading, error, sendRequest, handleErrorClear } = useHttpClient();
+
+  useEffect(() => {
+    const getUsers = async () => {
+      try {
+        const response = await sendRequest("http://localhost:8000/api/users");
+        setUsersData(response.users);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+    getUsers();
+  }, []);
 
   return (
-    <UsersList users={usersData}/>
-  )
-}
+    <>
+      {error && <ErrorModal error={error} onClear={handleErrorClear} />}
+      {isLoading && (
+        <div className="flex justify-center items-center">
+          <LoadingSpinner />
+        </div>
+      )}
+      {!isLoading && <UsersList users={usersData} />}
+    </>
+  );
+};
 
-export default Users
+export default Users;

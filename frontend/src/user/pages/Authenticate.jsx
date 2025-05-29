@@ -10,10 +10,14 @@ import {
 } from "../../shared/util/validators";
 import "../../places/pages/NewPlace.css";
 import { AuthContext } from "../../shared/context/AuthContext";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/ErrorModal/LoadingSpinner";
+import { useHttpClient } from "../../shared/hooks/HttpHook";
 
 const Register = () => {
   const auth = useContext(AuthContext);
   const [isLogin, setIsLogin] = useState(false);
+  const {isLoading, error, sendRequest, handleErrorClear } = useHttpClient();
   const [formState, InputHandler, setFormData] = useForm(
     {
       email: {
@@ -40,12 +44,38 @@ const Register = () => {
     false
   );
 
-  const AuthenticateSubmitHandler = (event) => {
+  const AuthenticateSubmitHandler = async (event) => {
     event.preventDefault();
-    auth.logIn();
-    console.log(formState.inputs);
+    try {
+      const url = isLogin
+        ? "http://localhost:8000/api/users/login"
+        : "http://localhost:8000/api/users/register";
+
+      const response = await sendRequest(
+        url,
+        "POST",
+        {
+          email: formState.inputs.email.value,
+          password: formState.inputs.password.value,
+          ...(isLogin
+            ? {}
+            : {
+                name: formState.inputs.name.value,
+                image: formState.inputs.image.value,
+              }),
+        },
+        
+      );
+      auth.logIn(response.user.id);
+      console.log(response.user);
+    } catch (error) {
+      console.error(
+        "Error during authentication:",
+        error.response?.data || error.message
+      );
+    }
   };
-console.log(formState.isValid)
+
   const switchHandler = () => {
     if (!isLogin) {
       setFormData(
@@ -81,73 +111,79 @@ console.log(formState.isValid)
     setIsLogin((prev) => !prev);
   };
 
+
   return (
-    <form className="place-form" onSubmit={AuthenticateSubmitHandler}>
-      <Input
-        id="email"
-        element="input"
-        label="Email"
-        type="text"
-        validators={[VALIDATOR_EMAIL()]}
-        errorText={"Enter Correct Email"}
-        onInput={InputHandler}
-      />
-      {!isLogin && (
+    <>
+      <ErrorModal error={error} onClear={handleErrorClear} />
+      {isLoading && <LoadingSpinner asOverlay />}
+      <form className="place-form" onSubmit={AuthenticateSubmitHandler}>
         <Input
-          id="name"
+          id="email"
           element="input"
-          label="Name"
+          label="Email"
           type="text"
-          validators={[VALIDATOR_REQUIRE()]}
+          validators={[VALIDATOR_EMAIL()]}
           errorText={"Enter Correct Email"}
           onInput={InputHandler}
         />
-      )}
-      <Input
-        id="password"
-        element="input"
-        label="Password"
-        type="password"
-        validators={[VALIDATOR_MINLENGTH(8)]}
-        errorText={"Enter Password at least 8 Characters"}
-        onInput={InputHandler}
-      />
-      {!isLogin && (
-        <>
+        {!isLogin && (
           <Input
-            id="confirmPassword"
+            id="name"
             element="input"
-            label="Confirm Password"
-            type="password"
-            validators={[
-              VALIDATOR_MATCHPASSWORD(() => formState.inputs.password.value)
-            ]}
-            errorText={"Passwords dont match"}
-            onInput={InputHandler}
-          />
-          <Input
-            id="image"
-            element="input"
-            label="Profile Image"
+            label="Name"
             type="text"
             validators={[VALIDATOR_REQUIRE()]}
-            errorText={"Chose profile image"}
+            errorText={"Enter Correct Email"}
             onInput={InputHandler}
           />
-        </>
-      )}
-      <Button type="submit" disabled={!formState.isValid}>
-        {isLogin ? "Login" : "Register"}
-      </Button>
-      <Button
-        inverse
-        onClick={(e) => {
-          switchHandler(); e.preventDefault();
-        }}
-      >
-        {!isLogin ? "Login" : "Register"}
-      </Button>
-    </form>
+        )}
+        <Input
+          id="password"
+          element="input"
+          label="Password"
+          type="password"
+          validators={[VALIDATOR_MINLENGTH(8)]}
+          errorText={"Enter Password at least 8 Characters"}
+          onInput={InputHandler}
+        />
+        {!isLogin && (
+          <>
+            <Input
+              id="confirmPassword"
+              element="input"
+              label="Confirm Password"
+              type="password"
+              validators={[
+                VALIDATOR_MATCHPASSWORD(() => formState.inputs.password.value),
+              ]}
+              errorText={"Passwords dont match"}
+              onInput={InputHandler}
+            />
+            <Input
+              id="image"
+              element="input"
+              label="Profile Image"
+              type="text"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText={"Chose profile image"}
+              onInput={InputHandler}
+            />
+          </>
+        )}
+        <Button type="submit" disabled={!formState.isValid}>
+          {isLogin ? "Login" : "Register"}
+        </Button>
+        <Button
+          inverse
+          onClick={(e) => {
+            switchHandler();
+            e.preventDefault();
+          }}
+        >
+          {!isLogin ? "Login" : "Register"}
+        </Button>
+      </form>
+    </>
   );
 };
 
