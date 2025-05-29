@@ -15,7 +15,6 @@ export const useHttpClient = () => {
           method,
           data: body,
           headers: {
-            "Content-Type": "application/json",
             ...headers,
           },
         });
