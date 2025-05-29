@@ -33,13 +33,8 @@ const PlaceItem = ({
   const confirmDelete = async () => {
     try {
       setShowDeleteDialog(false);
-      const response = await sendRequest(`http://localhost:8000/api/places/${id}`, "DELETE");
-      if (response === null || response === undefined) {
-        console.error("Unexpected server response: null or undefined");
-        console.log(response)
-        throw new Error("Unexpected server response: null or undefined");
-      }
-      onDelete(id);
+      await sendRequest(`http://localhost:8000/api/places/${id}`, "DELETE");      
+        onDelete(id);
     } catch (error) {
       console.error("Error deleting place:", error);
     }
@@ -100,7 +95,7 @@ const PlaceItem = ({
           <Button inverse onClick={openMapHandler}>
             View on Map
           </Button>
-          {auth.isLoggedIn && (
+          {auth.userId === id && (
             <>
               <Button to={`/places/${id}`}>Edit</Button>
               <Button danger onClick={handleShowDeleteDialog}>
