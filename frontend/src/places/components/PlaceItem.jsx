@@ -16,13 +16,14 @@ const PlaceItem = ({
   description,
   address,
   coordinates,
+  creatorId,
   onDelete,
 }) => {
   const [showMap, setShowMap] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const auth = useContext(AuthContext);
-    const {isLoading, error, sendRequest, handleErrorClear } = useHttpClient();
-
+  const { isLoading, error, sendRequest, handleErrorClear } = useHttpClient();
+  console.log(id);
   const handleShowDeleteDialog = () => {
     setShowDeleteDialog(true);
   };
@@ -33,8 +34,8 @@ const PlaceItem = ({
   const confirmDelete = async () => {
     try {
       setShowDeleteDialog(false);
-      await sendRequest(`http://localhost:8000/api/places/${id}`, "DELETE");      
-        onDelete(id);
+      await sendRequest(`http://localhost:8000/api/places/${id}`, "DELETE");
+      onDelete(id);
     } catch (error) {
       console.error("Error deleting place:", error);
     }
@@ -46,7 +47,7 @@ const PlaceItem = ({
 
   return (
     <>
-    <ErrorModal error={error} onClear={handleErrorClear} />
+      <ErrorModal error={error} onClear={handleErrorClear} />
       <Modal
         show={showMap}
         onCancel={closeMapHandler}
@@ -82,9 +83,13 @@ const PlaceItem = ({
         <p>This action can not be undone.</p>
       </Modal>
       <Card className="w-full max-w-[800px]">
-        {isLoading && <LoadingSpinner asOverlay/>}
+        {isLoading && <LoadingSpinner asOverlay />}
         <div className="relative w-full aspect-[16/9]">
-          <img className="w-full h-full" src={image} alt={title} />
+          <img
+            className="w-full h-full"
+            src={`http://localhost:8000/${image}`}
+            alt={title}
+          />
         </div>
         <div>
           <div className="font-bold text-[32px]">{title}</div>
@@ -95,7 +100,7 @@ const PlaceItem = ({
           <Button inverse onClick={openMapHandler}>
             View on Map
           </Button>
-          {auth.userId === id && (
+          {auth.userId === creatorId && (
             <>
               <Button to={`/places/${id}`}>Edit</Button>
               <Button danger onClick={handleShowDeleteDialog}>

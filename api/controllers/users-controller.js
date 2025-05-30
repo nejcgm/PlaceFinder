@@ -39,7 +39,7 @@ const register = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image: "https://example.com/alice-smith.jpg",
+    image: req.file.path,
     password,
     places: [],
   });
@@ -50,7 +50,7 @@ const register = async (req, res, next) => {
     const error = new HttpError("Creating User failed", 500);
     return next(error);
   }
-  res.status(201).json({ User: createdUser.toObject({ getters: true }) });
+  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
 const logIn = async (req, res, next) => {
@@ -69,7 +69,10 @@ const logIn = async (req, res, next) => {
     );
   }
 
-  res.json({ message: "Logged in successfully!", user: existingUser.toObject({ getters: true }) });
+  res.json({
+    message: "Logged in successfully!",
+    user: existingUser.toObject({ getters: true }),
+  });
 };
 
 exports.getAllUsers = getAllUsers;

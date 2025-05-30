@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const HttpError = require("./models/http-error");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
 
 const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
@@ -13,16 +15,19 @@ const DB_PASSWORD = process.env.DB_PASSWORD;
 const DB_NAME = process.env.DB_NAME;
 
 const app = express();
+
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
+
 app.use(
   cors({
     origin: "http://localhost:5173",
-    methods: ['GET', 'POST', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
+    // allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 app.use(bodyParser.json());
-
+// app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/places", placesRoutes);
 
@@ -33,6 +38,11 @@ app.use((req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    });
+  }
   if (res.headerSent) {
     return next(error);
   }

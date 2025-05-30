@@ -9,7 +9,7 @@ const UserItem = ({ image, name, placeCount, id }) => {
       <Link to={`/${id}/places`}>
         <Card className="flex gap-4 items-center">
           <div className="aspect-[1] w-[64px]">
-            <Avatar image={image} alt={name} />
+            <Avatar image={`http://localhost:8000/${image}`} alt={name} />
           </div>
           <div>
             <div className="text-[20px] font-bold">{name}</div>
