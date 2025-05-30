@@ -5,6 +5,7 @@ const { validationResult } = require("express-validator");
 const Place = require("../models/place");
 const User = require("../models/user");
 const mongoose = require("mongoose");
+const fs = require("fs");
 
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.placeId;
@@ -55,7 +56,7 @@ const createPlace = async (req, res, next) => {
     );
   }
 
-  const { title, description, imageUrl, address, creator } = req.body;
+  const { title, description, address, creator } = req.body;
 
   let location;
   try {
@@ -69,7 +70,7 @@ const createPlace = async (req, res, next) => {
   const createdPlace = new Place({
     title,
     description,
-    image: imageUrl,
+    image: req.file.path,
     address,
     location,
     creator,
@@ -108,7 +109,7 @@ const updatePlace = async (req, res, next) => {
     );
   }
   const placeId = req.params.placeId;
-  const { title, description, address, imageUrl } = req.body;
+  const { title, description, address } = req.body;
 
   let place;
   try {
@@ -131,12 +132,12 @@ const updatePlace = async (req, res, next) => {
     );
   }
 
-  place.title = title;
-  place.description = description;
-  place.address = address;
-  place.image = imageUrl;
-  place.location = location;
-  
+  (place.title = title),
+    (place.description = description),
+    (place.address = address),
+    (place.image = req.file.path),
+    (place.location = location);
+
   try {
     await place.save();
   } catch (err) {
@@ -158,6 +159,7 @@ const deletePlace = async (req, res, next) => {
   if (!place) {
     return next(new HttpError("Could not find place to delete by id", 404));
   }
+  const imagePath = place.image;
 
   try {
     const session = await mongoose.startSession();
@@ -169,6 +171,10 @@ const deletePlace = async (req, res, next) => {
   } catch (err) {
     return next(new HttpError("Could not delete place", 500));
   }
+  fs.unlink(imagePath, (err) => {
+    console.log(err);
+  });
+
   res.status(200).json({ message: "Place deleted." });
 };
 

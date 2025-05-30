@@ -13,6 +13,8 @@ import { useHttpClient } from "../../shared/hooks/HttpHook";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/ErrorModal/LoadingSpinner";
 import { useNavigate } from "react-router-dom";
+import ImageUpload from "../../shared/components/FormElements/image-upload/ImageUpload";
+
 const UpdatePlace = () => {
   const placeId = useParams().placeId;
   const { isLoading, error, sendRequest, handleErrorClear } = useHttpClient();
@@ -36,7 +38,7 @@ const UpdatePlace = () => {
         value: "",
         isValid: false,
       },
-      imageUrl: {
+      image: {
         value: "",
         isValid: false,
       },
@@ -64,7 +66,7 @@ const UpdatePlace = () => {
               value: response.address,
               isValid: true,
             },
-            imageUrl: {
+            image: {
               value: response.image,
               isValid: true,
             },
@@ -79,27 +81,28 @@ const UpdatePlace = () => {
     getPlaceById();
   }, [placeId, sendRequest, setFormData]);
 
-
   const placeUpdateSubmitHandler = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
     try {
-      await sendRequest(`http://localhost:8000/api/places/${placeId}`, "PATCH", {
-        title: formState.inputs.title.value,
-        description: formState.inputs.description.value,
-        address: formState.inputs.address.value,
-        imageUrl: formState.inputs.imageUrl.value,
-      });
+      formData.append("title", formState.inputs.title.value);
+      formData.append("description", formState.inputs.description.value);
+      formData.append("address", formState.inputs.address.value);
+      formData.append("image", formState.inputs.image.value);
+      await sendRequest(
+        `http://localhost:8000/api/places/${placeId}`,
+        "PATCH",
+        formData
+      );
       console.log("Place updated successfully");
       navigate(`/${identifiedPlace.creator}/places`);
     } catch (error) {
       console.error("Error updating place:", error);
     }
   };
-if (isLoading) {
-  return (
-    <LoadingSpinner/>
-  );
-}
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   if (!identifiedPlace && !error) {
     return (
@@ -113,59 +116,54 @@ if (isLoading) {
     <>
       <ErrorModal error={error} onClear={handleErrorClear} />
       {!isLoading && identifiedPlace && (
-      <form className="place-form" onSubmit={placeUpdateSubmitHandler}>
-        <Input
-          id="title"
-          element="input"
-          type="text"
-          label="Title"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Enter Title"
-          onInput={InputHandler}
-          defaultValue={identifiedPlace.title}
-          defaultIsValid={true}
-        />
+        <form className="place-form" onSubmit={placeUpdateSubmitHandler}>
+          <Input
+            id="title"
+            element="input"
+            type="text"
+            label="Title"
+            validators={[VALIDATOR_REQUIRE()]}
+            errorText="Enter Title"
+            onInput={InputHandler}
+            defaultValue={identifiedPlace.title}
+            defaultIsValid={true}
+          />
 
-        <Input
-          id="description"
-          element="textarea"
-          label="Description"
-          validators={[VALIDATOR_MINLENGTH(5)]}
-          errorText="Description is to short"
-          onInput={InputHandler}
-          defaultValue={identifiedPlace.description}
-          defaultIsValid={true}
-        />
-        <Input
-          id="address"
-          element="input"
-          type="text"
-          label="Address"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Enter Address"
-          onInput={InputHandler}
-          defaultValue={identifiedPlace.address}
-          defaultIsValid={true}
-        />
-        <Input
-          id="imageUrl"
-          element="input"
-          type="text"
-          label="Image URL"
-          validators={[VALIDATOR_REQUIRE()]}
-          errorText="Enter Image URL"
-          onInput={InputHandler}
-          defaultValue={identifiedPlace.image}
-          defaultIsValid={true}
-        />
+          <Input
+            id="description"
+            element="textarea"
+            label="Description"
+            validators={[VALIDATOR_MINLENGTH(5)]}
+            errorText="Description is to short"
+            onInput={InputHandler}
+            defaultValue={identifiedPlace.description}
+            defaultIsValid={true}
+          />
+          <Input
+            id="address"
+            element="input"
+            type="text"
+            label="Address"
+            validators={[VALIDATOR_REQUIRE()]}
+            errorText="Enter Address"
+            onInput={InputHandler}
+            defaultValue={identifiedPlace.address}
+            defaultIsValid={true}
+          />
+          <ImageUpload
+            center
+            id="image"
+            onInput={InputHandler}
+            errorText={"Please upload an image."}
+          />
 
-        <Button type="submit" disabled={!formState.isValid}>
-          Update Place
-        </Button>
-        <Button inverse to={`/`}>
-          Cancel
-        </Button>
-      </form>
+          <Button type="submit" disabled={!formState.isValid}>
+            Update Place
+          </Button>
+          <Button inverse to={`/`}>
+            Cancel
+          </Button>
+        </form>
       )}
     </>
   );

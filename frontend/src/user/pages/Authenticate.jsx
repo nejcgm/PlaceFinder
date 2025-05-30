@@ -13,11 +13,12 @@ import { AuthContext } from "../../shared/context/AuthContext";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/ErrorModal/LoadingSpinner";
 import { useHttpClient } from "../../shared/hooks/HttpHook";
+import ImageUpload from "../../shared/components/FormElements/image-upload/ImageUpload";
 
 const Register = () => {
   const auth = useContext(AuthContext);
   const [isLogin, setIsLogin] = useState(false);
-  const {isLoading, error, sendRequest, handleErrorClear } = useHttpClient();
+  const { isLoading, error, sendRequest, handleErrorClear } = useHttpClient();
   const [formState, InputHandler, setFormData] = useForm(
     {
       email: {
@@ -28,15 +29,15 @@ const Register = () => {
         value: "",
         isValid: false,
       },
+      image: {
+        value: "",
+        isValid: true,
+      },
       password: {
         value: "",
         isValid: false,
       },
       confirmPassword: {
-        value: "",
-        isValid: false,
-      },
-      image: {
         value: "",
         isValid: false,
       },
@@ -51,23 +52,24 @@ const Register = () => {
         ? "http://localhost:8000/api/users/login"
         : "http://localhost:8000/api/users/register";
 
+      const formData = new FormData();
+      const input = {
+        email: formState.inputs.email.value,
+        password: formState.inputs.password.value,
+      };
+
+      if (!isLogin) {
+        formData.append("email", formState.inputs.email.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("name", formState.inputs.name.value);
+        formData.append("image", formState.inputs.image.value);
+      }
       const response = await sendRequest(
         url,
         "POST",
-        {
-          email: formState.inputs.email.value,
-          password: formState.inputs.password.value,
-          ...(isLogin
-            ? {}
-            : {
-                name: formState.inputs.name.value,
-                image: formState.inputs.image.value,
-              }),
-        },
-        
+        isLogin ? input : formData
       );
       auth.logIn(response.user.id);
-      console.log(response.user);
     } catch (error) {
       console.error(
         "Error during authentication:",
@@ -82,8 +84,8 @@ const Register = () => {
         {
           ...formState.inputs,
           name: undefined,
-          confirmPassword: undefined,
           image: undefined,
+          confirmPassword: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -95,11 +97,11 @@ const Register = () => {
             value: "",
             isValid: false,
           },
-          confirmPassword: {
-            value: "",
-            isValid: false,
-          },
           image: {
+            value: "",
+            isValid: true,
+          },
+          confirmPassword: {
             value: "",
             isValid: false,
           },
@@ -110,7 +112,6 @@ const Register = () => {
 
     setIsLogin((prev) => !prev);
   };
-
 
   return (
     <>
@@ -127,15 +128,23 @@ const Register = () => {
           onInput={InputHandler}
         />
         {!isLogin && (
-          <Input
-            id="name"
-            element="input"
-            label="Name"
-            type="text"
-            validators={[VALIDATOR_REQUIRE()]}
-            errorText={"Enter Correct Email"}
-            onInput={InputHandler}
-          />
+          <>
+            <Input
+              id="name"
+              element="input"
+              label="Name"
+              type="text"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText={"Enter Correct Email"}
+              onInput={InputHandler}
+            />
+            <ImageUpload
+              center
+              id="image"
+              onInput={InputHandler}
+              errorText={"Please upload an image."}
+            />
+          </>
         )}
         <Input
           id="password"
@@ -157,15 +166,6 @@ const Register = () => {
                 VALIDATOR_MATCHPASSWORD(() => formState.inputs.password.value),
               ]}
               errorText={"Passwords dont match"}
-              onInput={InputHandler}
-            />
-            <Input
-              id="image"
-              element="input"
-              label="Profile Image"
-              type="text"
-              validators={[VALIDATOR_REQUIRE()]}
-              errorText={"Chose profile image"}
               onInput={InputHandler}
             />
           </>
