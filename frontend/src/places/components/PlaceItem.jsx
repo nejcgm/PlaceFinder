@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext} from "react";
 import Card from "../../shared/components/UIElements/Card/Card";
 import Button from "../../shared/components/FormElements/Button/Button";
 import Modal from "../../shared/components/UIElements/Modal/Modal";
@@ -8,6 +8,7 @@ import { AuthContext } from "../../shared/context/AuthContext";
 import { useHttpClient } from "../../shared/hooks/HttpHook";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal/ErrorModal";
 import LoadingSpinner from "../../shared/components/UIElements/ErrorModal/LoadingSpinner";
+import { osm } from 'pigeon-maps/providers';
 
 const PlaceItem = ({
   id,
@@ -60,10 +61,14 @@ const PlaceItem = ({
       >
         <Map
           height={400}
-          defaultCenter={[coordinates.lat, coordinates.lng]}
-          defaultZoom={11}
+          defaultCenter={[coordinates.lat, coordinates.long]}
+          defaultZoom={10}
+          provider={osm}
         >
-          <Marker width={50} anchor={[coordinates.lat, coordinates.lng]} />
+          <Marker
+           width={50} 
+           anchor={[coordinates.lat, coordinates.long]} 
+           />
         </Map>
       </Modal>
       <Modal

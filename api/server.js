@@ -40,7 +40,11 @@ app.use((req, res, next) => {
 app.use((error, req, res, next) => {
   if (req.file) {
     fs.unlink(req.file.path, (err) => {
-      console.log(err);
+      if (err) {
+        console.error("Failed to delete file:", err);
+      } else {
+        console.log("File deleted successfully:", req.file.path);
+      }
     });
   }
   if (res.headerSent) {
