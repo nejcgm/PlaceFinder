@@ -25,7 +25,7 @@ async function getCoordinates(address) {
       const { lat, lon } = response.data[0];
       return {
         lat: parseFloat(lat),
-        lng: parseFloat(lon)
+        long: parseFloat(lon)
       };
     } else {
       throw new HttpError("Location not found", 404);

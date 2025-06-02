@@ -137,7 +137,7 @@ const updatePlace = async (req, res, next) => {
   place.title = title;
   place.description = description;
   place.address = address;
-  place.image = req.file.path;
+  place.image = req.file ? req.file.path : place.image;
   place.location = location;
 
   try {
