@@ -123,11 +123,9 @@ const logIn = async (req, res, next) => {
 
   res.json({
     message: "Logged in successfully!",
-    user: existingUser.toObject({
       userId: existingUser.id,
       email: existingUser.email,
       token: token,
-    }),
   });
 };
 

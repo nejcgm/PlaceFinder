@@ -14,9 +14,12 @@ import ErrorModal from "../../shared/components/UIElements/ErrorModal/ErrorModal
 import LoadingSpinner from "../../shared/components/UIElements/ErrorModal/LoadingSpinner";
 import { useNavigate } from "react-router-dom";
 import ImageUpload from "../../shared/components/FormElements/image-upload/ImageUpload";
+import { AuthContext } from "../../shared/context/AuthContext";
+import { useContext } from "react";
 
 const UpdatePlace = () => {
   const placeId = useParams().placeId;
+  const auth = useContext(AuthContext);
   const { isLoading, error, sendRequest, handleErrorClear } = useHttpClient();
   const [identifiedPlace, setIdentifiedPlace] = useState();
   const navigate = useNavigate();
@@ -92,7 +95,8 @@ const UpdatePlace = () => {
       await sendRequest(
         `http://localhost:8000/api/places/${placeId}`,
         "PATCH",
-        formData
+        formData,
+        { Authorization: "Bearer " + auth.token }
       );
       console.log("Place updated successfully");
       navigate(`/${identifiedPlace.creator}/places`);

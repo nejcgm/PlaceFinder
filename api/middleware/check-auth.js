@@ -3,6 +3,9 @@ const jwt = require("jsonwebtoken");
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
 module.exports = (req, res, next) => {
+  if(req.method === "OPTIONS") {
+    return next();
+  }
   const token = req.headers.authorization.split(" ")[1];
   try {
     if (!token) {

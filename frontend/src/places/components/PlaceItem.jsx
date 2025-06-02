@@ -23,7 +23,7 @@ const PlaceItem = ({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const auth = useContext(AuthContext);
   const { isLoading, error, sendRequest, handleErrorClear } = useHttpClient();
-  console.log(id);
+  
   const handleShowDeleteDialog = () => {
     setShowDeleteDialog(true);
   };
@@ -34,7 +34,9 @@ const PlaceItem = ({
   const confirmDelete = async () => {
     try {
       setShowDeleteDialog(false);
-      await sendRequest(`http://localhost:8000/api/places/${id}`, "DELETE");
+      await sendRequest(`http://localhost:8000/api/places/${id}`, "DELETE", null, {
+        Authorization: "Bearer " + auth.token,
+      });
       onDelete(id);
     } catch (error) {
       console.error("Error deleting place:", error);
@@ -100,7 +102,7 @@ const PlaceItem = ({
           <Button inverse onClick={openMapHandler}>
             View on Map
           </Button>
-          {auth.userId === creatorId && (
+          {auth.userId  === creatorId && (
             <>
               <Button to={`/places/${id}`}>Edit</Button>
               <Button danger onClick={handleShowDeleteDialog}>
