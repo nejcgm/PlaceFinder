@@ -81,6 +81,7 @@ const Register = () => {
 
   const switchHandler = () => {
     if (!isLogin) {
+      console.log("Switching to login mode");
       setFormData(
         {
           ...formState.inputs,
@@ -156,6 +157,12 @@ const Register = () => {
           errorText={"Enter Password at least 8 Characters"}
           onInput={InputHandler}
         />
+        <div>
+        {formState.inputs.password.isValid }
+        </div>
+        <div>
+        {formState.inputs.email.isValid }
+        </div>
         {!isLogin && (
           <>
             <Input
@@ -171,9 +178,14 @@ const Register = () => {
             />
           </>
         )}
-        <Button type="submit" disabled={!formState.isValid}>
-          {isLogin ? "Login" : "Register"}
+        {isLogin ? (<Button type="submit" disabled={!formState.inputs.password.isValid || !formState.inputs.email.isValid}>
+           Login
+        </Button>):(
+          <Button type="submit" disabled={!formState.isValid}>
+        Register
         </Button>
+        )}
+        
         <Button
           inverse
           onClick={(e) => {
