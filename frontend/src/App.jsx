@@ -1,4 +1,3 @@
-import React, { useState, useCallback } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -12,23 +11,14 @@ import NewPlace from "./places/pages/NewPlace";
 import UpdatePlace from "./places/pages/UpdatePlace";
 import Authenticate from "./user/pages/Authenticate";
 import { AuthContext } from "./shared/context/AuthContext";
+import { useAuth } from "./shared/hooks/AuthHook";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userId, setUserId] = useState(null);
-
-  const logIn = useCallback((uid) => {
-    setUserId(uid);
-    setIsLoggedIn(true);
-  }, []);
-
-  const logOut = useCallback(() => {
-    setIsLoggedIn(false);
-    setUserId(null);
-  }, []);
+ 
+  const { token, logIn, logOut, userId } = useAuth();
 
   let routes;
-  if (isLoggedIn) {
+  if (token) {
     routes = (
       <>
         <Route path="/" element={<Users />} />
@@ -53,7 +43,8 @@ const App = () => {
     <>
       <AuthContext.Provider
         value={{
-          isLoggedIn: isLoggedIn,
+          isLoggedIn: !!token,
+          token: token,
           userId: userId,
           logIn: logIn,
           logOut: logOut,

@@ -56,7 +56,7 @@ const createPlace = async (req, res, next) => {
     );
   }
 
-  const { title, description, address, creator } = req.body;
+  const { title, description, address } = req.body;
 
   let location;
   try {
@@ -73,12 +73,12 @@ const createPlace = async (req, res, next) => {
     image: req.file.path,
     address,
     location,
-    creator,
+    creator: req.userData.userId,
   });
 
   let user;
   try {
-    user = await User.findById(creator);
+    user = await User.findById(req.userData.userId);
   } catch (err) {
     return next(new HttpError("creating place failed", 500));
   }
@@ -117,7 +117,9 @@ const updatePlace = async (req, res, next) => {
   } catch (err) {
     return next(new HttpError("Could not find place to update by id", 500));
   }
-
+  if (place.creator.toString() !== req.userData.userId) {
+    return next(new HttpError("You are not allowed to edit this place.", 401));
+  }
   if (!place) {
     return next(
       new HttpError("Could not find a place for the provided id.", 404)
@@ -132,11 +134,11 @@ const updatePlace = async (req, res, next) => {
     );
   }
 
-  (place.title = title),
-    (place.description = description),
-    (place.address = address),
-    (place.image = req.file.path),
-    (place.location = location);
+  place.title = title;
+  place.description = description;
+  place.address = address;
+  place.image = req.file.path;
+  place.location = location;
 
   try {
     await place.save();
@@ -154,6 +156,9 @@ const deletePlace = async (req, res, next) => {
     place = await Place.findById(placeId).populate("creator");
   } catch (err) {
     return next(new HttpError("Something went wrong", 500));
+  }
+  if (place.creator.id !== req.userData.userId) {
+    return next(new HttpError("You are not allowed to edit this place.", 401));
   }
 
   if (!place) {

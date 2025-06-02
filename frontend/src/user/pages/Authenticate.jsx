@@ -69,7 +69,8 @@ const Register = () => {
         "POST",
         isLogin ? input : formData
       );
-      auth.logIn(response.user.id);
+      console.log(response);
+      auth.logIn(response.userId, response.token);
     } catch (error) {
       console.error(
         "Error during authentication:",
